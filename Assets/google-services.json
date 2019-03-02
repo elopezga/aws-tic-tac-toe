@@ -17,6 +17,14 @@
         {
           "client_id": "177828748502-k0f46idgeg2f69p36a138svvgg3mt1cl.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "177828748502-ttlebiesq0180lksvpevphjsb0illukd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.comp680.awstictactoe",
+            "certificate_hash": "6a31a9f20463224c4b3de76e1234b4da834c92e1"
+          }
         }
       ],
       "api_key": [
