@@ -14,9 +14,19 @@ public class LoginWithEmailFormController : MonoBehaviour
 
     private Firebase.Auth.FirebaseAuth auth;
 
+    private bool logInSuccessful = false;
+
     void Start()
     {
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+    }
+
+    void Update()
+    {
+        if(logInSuccessful)
+        {
+            SceneManager.LoadScene("MainMenu/MainMenu");
+        }
     }
 
     public void Login()
@@ -39,9 +49,14 @@ public class LoginWithEmailFormController : MonoBehaviour
 
                 Firebase.Auth.FirebaseUser newUser = task.Result;
                 Debug.LogFormat("User signed in successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
-
-                SceneManager.LoadScene("MainMenu/MainMenu");
+                LoggedInUser.SetLoggedInUser(newUser);
+                logInSuccessful = true;
             });
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu/MainMenu");
     }
 
     public void GoToLoginWithEmailScene()
