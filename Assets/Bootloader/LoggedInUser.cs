@@ -4,7 +4,7 @@ public class LoggedInUser : MonoBehaviour
 {
     public static LoggedInUser Instance = null;
 
-    private static Firebase.Auth.FirebaseUser loggedInUser = null;
+    private Firebase.Auth.FirebaseUser loggedInUser = null;
 
     void Awake()
     {
@@ -13,12 +13,12 @@ public class LoggedInUser : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    public static void SetLoggedInUser(Firebase.Auth.FirebaseUser user)
+    public void SetLoggedInUser(Firebase.Auth.FirebaseUser user)
     {
         loggedInUser = user;
     }
 
-    public static string GetUserUID()
+    public string GetUserUID()
     {
         return loggedInUser.UserId;
     }
