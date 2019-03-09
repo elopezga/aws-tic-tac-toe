@@ -50,6 +50,8 @@ public class MainMenuController : MonoBehaviour
         string apiEndpoint = apiEndpointHost + getRoomsEndpointFormat;
         string apiCall = string.Format(apiEndpoint, LoggedInUser.Instance.GetUserUID());
 
+        RemoveAllFindingPlayers();
+
         StartCoroutine(MakeAPICall(
             apiCall,
             HandleGetRoomsSuccess,
@@ -76,14 +78,15 @@ public class MainMenuController : MonoBehaviour
             roomsPlayerIsCurrentlyIn.Add(roomData);
         }
 
-        // Dirty hack to properly display buttons in vertical layout group
-        Content.SetActive(false);
-        Content.SetActive(true);
+        RefreshContent();
     }
 
     private void HandleNewGameSuccess(string response)
     {
         Debug.Log(response);
+
+        // Refresh the rooms
+        GetRooms();
         newGameButtonController.Enable();
     }
 
@@ -101,6 +104,24 @@ public class MainMenuController : MonoBehaviour
         {
             onSuccess(apiRequest.downloadHandler.text);
         }
+    }
+
+    private void RemoveAllFindingPlayers()
+    {
+        foreach(RoomData roomData in roomsPlayerIsCurrentlyIn)
+        {
+            Destroy(roomData.gameObject);
+        }
+        roomsPlayerIsCurrentlyIn.Clear();
+
+        RefreshContent();
+    }
+
+    private void RefreshContent()
+    {
+        // Dirty hack to properly display buttons in vertical layout group
+        Content.SetActive(false);
+        Content.SetActive(true);
     }
 
 }
