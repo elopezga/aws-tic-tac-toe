@@ -1,7 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
-admin.initializeApp(functions.config().firebase);
+const startGame = require('./startgame');
 
 var db = admin.firestore();
 
@@ -30,7 +30,6 @@ exports.match = () => functions.https.onRequest((request, response) => {
             else
             {
                 // We got a room, lets join
-                // Todo: Check that the same player is not joining a room that s/he created
                 let joinedRoom = false;
 
                 for(var doc of snapshot.docs)
@@ -44,14 +43,31 @@ exports.match = () => functions.https.onRequest((request, response) => {
                         continue;
                     }
 
+                    // Get the owner of the room
+                    let roomOwner = room.players[0];
+
                     // Add player to room
                     // This should be a transaction to prevent more than 2 people joining
-                    db.collection('rooms').doc(doc.id)
+                    db.collection('rooms')
+                        .doc(doc.id)
                         .update({
                             players: admin.firestore.FieldValue.arrayUnion(uuid),
                             isFull: true
                         });
                     joinedRoom = true;
+
+                    // Create game, then delete room
+                    startGame.startGame(roomOwner, uuid);
+                    db.collection('rooms')
+                        .doc(doc.id)
+                        .delete()
+                        .then( message => {
+                            console.log("Deleted room with message: " + message);
+                            return message;
+                        })
+                        .catch( error => {
+                            console.log(error);
+                        })
                     break;
                 }
 

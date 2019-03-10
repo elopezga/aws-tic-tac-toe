@@ -1,4 +1,7 @@
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+
+admin.initializeApp(functions.config().firebase);
 
 // Other functions
 const matchmake = require('./matchmake');
@@ -14,4 +17,4 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 
 exports.matchmake = matchmake.match();
 exports.getrooms = getrooms.getrooms();
-exports.startgame = startgame.startgame();
+exports.startgame = startgame.startGameHttps();
