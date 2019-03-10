@@ -6,6 +6,7 @@ var db = admin.firestore();
 exports.getrooms = () => functions.https.onRequest((request, response) => {
     const uuid = request.query.uuid;
 
+    // Could be faster if you store rooms in player document
     db.collection('rooms')
         .where('players', 'array-contains', uuid)
         .get()

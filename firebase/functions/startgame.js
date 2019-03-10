@@ -21,7 +21,8 @@ exports.startGameHttps = () => functions.https.onRequest((request, response) => 
 
 exports.startGame = function(owner, joiner)
 {
-    db.collection('games')
+    
+    return db.collection('games')
         .add({
             players: [owner, joiner],
             currentTurn: owner,
@@ -30,7 +31,21 @@ exports.startGame = function(owner, joiner)
                 middleRow: createEmptyRow(),
                 bottomRow: createEmptyRow()
             }
+        })
+        .then( docRef => {
+            db.collection('players')
+                .doc(owner)
+                .update({
+                    games: admin.firestore.FieldValue.arrayUnion(docRef.id)
+                });
+            db.collection('players')
+                .doc(joiner)
+                .update({
+                    games: admin.firestore.FieldValue.arrayUnion(docRef.id)
+                });
+            return;
         });
+    
 }
 
 function createEmptyRow(){
