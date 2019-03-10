@@ -19,6 +19,30 @@ exports.startGameHttps = () => functions.https.onRequest((request, response) => 
 
 });
 
+exports.deleteGameHttps = () => functions.https.onRequest((request, response) => {
+    /* const gameId = request.query.game;
+
+    db.collection('games')
+    .doc(gameId)
+    .delete()
+    .then( docRef => {
+        db.collection('players')
+        .where('games', 'array-contains', gameId)
+        .get()
+        .then(snapshot => {
+            snapshot.forEach(doc => {
+                doc.get("games")
+            });
+        })
+
+        return response.send("Deleted game " + gameId);
+    })
+    .catch( error => {
+        response.send(error);
+    })
+ */
+});
+
 exports.startGame = function(owner, joiner)
 {
     

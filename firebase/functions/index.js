@@ -19,4 +19,5 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 exports.matchmake = matchmake.match();
 exports.getrooms = getrooms.getrooms();
 exports.startgame = startgame.startGameHttps();
+exports.deletegame = startgame.deleteGameHttps();
 exports.getPlayerInfo = getPlayerInfo.getPlayerInfo();
