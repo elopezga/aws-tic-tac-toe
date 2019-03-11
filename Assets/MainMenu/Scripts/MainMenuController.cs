@@ -8,6 +8,9 @@ using UnityEngine.Networking;
 public class MainMenuController : MonoBehaviour
 {
     [SerializeField]
+    private float GameCheckPollingFrequencyInSeconds = 30f;
+
+    [SerializeField]
     private GameObject Content;
 
     [SerializeField]
@@ -20,19 +23,39 @@ public class MainMenuController : MonoBehaviour
     private NewGameButtonController newGameButtonController;
 
     private List<RoomData> roomsPlayerIsCurrentlyIn = new List<RoomData>();
-    private List<GameData> gamesPlayerIsCurrentlyIn = new List<GameData>();
+    private List<GameTurnsData> gamesPlayerIsCurrentlyIn = new List<GameTurnsData>();
+    private float timeSinceLastGameCheckPollInSeconds = 0f;
+    private bool isMakingRequest = false;
 
     private string apiEndpointHost = "https://us-central1-aws-tic-tac-toe.cloudfunctions.net";
     private string matchMakeEndpointFormat = "/matchmake?uuid={0}";
     private string getRoomsEndpointFormat = "/getrooms?uuid={0}";
     private string getPlayerInfoEndpointFormat = "/getPlayerInfo?uuid={0}";
+    private string getGameInfoEndpointFormat = "/getgameinfo?game={0}";
+    private string getGameTurnsEndpointFormat = "/getturns?uuid={0}";
 
     // Start is called before the first frame update
     void Start()
     {
-        GetPlayerInfo();
+        GetGameTurns();
         // Todo: Get rooms from firebase message
         GetRooms();
+    }
+
+    void Update()
+    {
+        // Pool Games
+        timeSinceLastGameCheckPollInSeconds += Time.deltaTime;
+        if (timeSinceLastGameCheckPollInSeconds >= GameCheckPollingFrequencyInSeconds)
+        {
+            if (!isMakingRequest)
+            {
+                GetRooms();
+                GetGameTurns();
+                timeSinceLastGameCheckPollInSeconds = 0f;
+            }
+        }
+
     }
 
     public void FindNewGame()
@@ -40,6 +63,7 @@ public class MainMenuController : MonoBehaviour
         string apiEndpoint = apiEndpointHost + matchMakeEndpointFormat;
         string apiCall = string.Format(apiEndpoint, LoggedInUser.Instance.GetUserUID());
 
+        isMakingRequest = true;
         newGameButtonController.Disable();
         StartCoroutine(MakeAPICall(
             apiCall,
@@ -62,18 +86,48 @@ public class MainMenuController : MonoBehaviour
         ));
     }
 
-    private void GetPlayerInfo()
+    private void GetGameTurns()
     {
-        string apiEndpoint = apiEndpointHost + getPlayerInfoEndpointFormat;
+        string apiEndpoint = apiEndpointHost + getGameTurnsEndpointFormat;
         string apiCall = string.Format(apiEndpoint, LoggedInUser.Instance.GetUserUID());
 
         RemoveAllGames();
 
         StartCoroutine(MakeAPICall(
             apiCall,
-            HandleGetPlayerInfoSuccess,
+            HandleGetGameTurnsSuccess,
             (error) => {Debug.LogError(error);}
         ));
+    }
+
+    private void HandleGetGameTurnsSuccess(string response)
+    {
+        GameObject gameButtonPrefab = Resources.Load("GameButton") as GameObject;
+
+        GameTurnsDataContainer[] gameTurnsData = JsonHelper.DeserializeFromServer<GameTurnsDataContainer>(response);
+
+        foreach(GameTurnsDataContainer turnData in gameTurnsData)
+        {
+            GameObject gameButton = Instantiate(gameButtonPrefab);
+            Vector3 localScale = gameButton.transform.localScale;
+            
+            if (turnData.turn == LoggedInUser.Instance.GetUserUID())
+            {
+                gameButton.transform.SetParent(YourTurnSection.transform);
+            }
+            else
+            {
+                gameButton.transform.SetParent(TheirTurnSection.transform);
+            }
+
+            gameButton.transform.localScale = localScale;
+
+            GameTurnsData gameTurnData = gameButton.GetComponent<GameTurnsData>();
+            gameTurnData.SetGameTurnData(turnData);
+            gamesPlayerIsCurrentlyIn.Add(gameTurnData);
+        }
+
+        RefreshContent();
     }
 
     private void HandleGetRoomsSuccess(string response)
@@ -104,16 +158,22 @@ public class MainMenuController : MonoBehaviour
 
         GameObject gameButtonPrefab = Resources.Load("GameButton") as GameObject;
         
+        // Create api that gives you gameid and whose turn
+        // will make this a lot easier
         foreach(string gameid in playerInfo.games)
         {
             // Get current players turn to decide where to place button
-            GameObject gameButton = Instantiate(gameButtonPrefab);
-            Vector3 localScale = gameButton.transform.localScale;
+            string apiEndpoint = apiEndpointHost + getGameInfoEndpointFormat;
+            string apiCall = string.Format(apiEndpoint, gameid);
+
+            /* GameObject gameButton = Instantiate(gameButtonPrefab);
+            Vector3 localScale = gameButton.transform.localScale; */
         }
     }
 
     private void HandleNewGameSuccess(string response)
     {
+        isMakingRequest = false;
         Debug.Log(response);
 
         // Refresh the rooms
@@ -150,7 +210,13 @@ public class MainMenuController : MonoBehaviour
 
     private void RemoveAllGames()
     {
+        foreach(GameTurnsData turnData in gamesPlayerIsCurrentlyIn)
+        {
+            Destroy(turnData.gameObject);
+        }
+        gamesPlayerIsCurrentlyIn.Clear();
 
+        RefreshContent();
     }
 
     private void RefreshContent()

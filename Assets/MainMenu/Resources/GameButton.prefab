@@ -79,7 +79,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Game {0}
+  m_Text: Game
 --- !u!114 &1156539611643775701
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,6 +115,7 @@ GameObject:
   - component: {fileID: 6370346908345191344}
   - component: {fileID: 2074526161403235092}
   - component: {fileID: 8604017361915476131}
+  - component: {fileID: 5067365433391864587}
   m_Layer: 5
   m_Name: GameButton
   m_TagString: Untagged
@@ -268,5 +269,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ef96de6444ef2e478dc08b990c80673, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5067365433391864587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6725409244999964666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77c043f713d7ce4489fbbc2d7be14cea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
