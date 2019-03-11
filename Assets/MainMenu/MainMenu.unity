@@ -907,6 +907,7 @@ GameObject:
   - component: {fileID: 627673778}
   - component: {fileID: 627673782}
   - component: {fileID: 627673783}
+  - component: {fileID: 627673784}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1018,6 +1019,18 @@ MonoBehaviour:
   YourTurnSection: {fileID: 233866470}
   TheirTurnSection: {fileID: 1281378496}
   newGameButtonController: {fileID: 634099151}
+--- !u!114 &627673784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627673777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b876248f37eada24e92d518defd20ca9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &634099144
 GameObject:
   m_ObjectHideFlags: 0
@@ -1237,7 +1250,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00005983698}
+  m_AnchoredPosition: {x: 0, y: 0.000060212857}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &741142807
@@ -1979,8 +1992,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 576864205}
   m_HandleRect: {fileID: 576864204}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 0.99999994
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

@@ -20,14 +20,17 @@ public class MainMenuController : MonoBehaviour
     private NewGameButtonController newGameButtonController;
 
     private List<RoomData> roomsPlayerIsCurrentlyIn = new List<RoomData>();
+    private List<GameData> gamesPlayerIsCurrentlyIn = new List<GameData>();
 
     private string apiEndpointHost = "https://us-central1-aws-tic-tac-toe.cloudfunctions.net";
     private string matchMakeEndpointFormat = "/matchmake?uuid={0}";
     private string getRoomsEndpointFormat = "/getrooms?uuid={0}";
+    private string getPlayerInfoEndpointFormat = "/getPlayerInfo?uuid={0}";
 
     // Start is called before the first frame update
     void Start()
     {
+        GetPlayerInfo();
         // Todo: Get rooms from firebase message
         GetRooms();
     }
@@ -59,6 +62,20 @@ public class MainMenuController : MonoBehaviour
         ));
     }
 
+    private void GetPlayerInfo()
+    {
+        string apiEndpoint = apiEndpointHost + getPlayerInfoEndpointFormat;
+        string apiCall = string.Format(apiEndpoint, LoggedInUser.Instance.GetUserUID());
+
+        RemoveAllGames();
+
+        StartCoroutine(MakeAPICall(
+            apiCall,
+            HandleGetPlayerInfoSuccess,
+            (error) => {Debug.LogError(error);}
+        ));
+    }
+
     private void HandleGetRoomsSuccess(string response)
     {
         List<RoomsDataContainer> rooms = new List<RoomsDataContainer>();
@@ -79,6 +96,20 @@ public class MainMenuController : MonoBehaviour
         }
 
         RefreshContent();
+    }
+
+    private void HandleGetPlayerInfoSuccess(string response)
+    {
+        PlayerInfoDataContainer playerInfo = JsonUtility.FromJson<PlayerInfoDataContainer>(response);
+
+        GameObject gameButtonPrefab = Resources.Load("GameButton") as GameObject;
+        
+        foreach(string gameid in playerInfo.games)
+        {
+            // Get current players turn to decide where to place button
+            GameObject gameButton = Instantiate(gameButtonPrefab);
+            Vector3 localScale = gameButton.transform.localScale;
+        }
     }
 
     private void HandleNewGameSuccess(string response)
@@ -115,6 +146,11 @@ public class MainMenuController : MonoBehaviour
         roomsPlayerIsCurrentlyIn.Clear();
 
         RefreshContent();
+    }
+
+    private void RemoveAllGames()
+    {
+
     }
 
     private void RefreshContent()
