@@ -60,12 +60,12 @@ exports.startGame = function(owner, joiner)
             db.collection('players')
                 .doc(owner)
                 .update({
-                    games: admin.firestore.FieldValue.arrayUnion(docRef.id)
+                    games: admin.firestore.FieldValue.arrayUnion({gameid: docRef.id, turn: owner})
                 });
             db.collection('players')
                 .doc(joiner)
                 .update({
-                    games: admin.firestore.FieldValue.arrayUnion(docRef.id)
+                    games: admin.firestore.FieldValue.arrayUnion({gameid: docRef.id, turn: owner})
                 });
             return;
         });

@@ -24,5 +24,6 @@ exports.startgame = startgame.startGameHttps();
 exports.deletegame = startgame.deleteGameHttps();
 exports.getPlayerInfo = getPlayerInfo.getPlayerInfo();
 exports.getturns = getPlayerInfo.getTurns();
+exports.getPlayerMenuInfo = getPlayerInfo.getPlayerMenuInfo();
 exports.getgameinfo = getgameinfo.getgameinfo();
 exports.createuser = createuser.createuser();

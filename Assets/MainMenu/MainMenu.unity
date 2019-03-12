@@ -1015,7 +1015,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d6d6a36e61d0df43a9e4c711bd5cae1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameCheckPollingFrequencyInSeconds: 5
+  GameCheckPollingFrequencyInSeconds: 10
   Content: {fileID: 741142805}
   YourTurnSection: {fileID: 233866470}
   TheirTurnSection: {fileID: 1281378496}

@@ -23,7 +23,7 @@ exports.match = () => functions.https.onRequest((request, response) => {
                         players: [uuid],
                         created: admin.firestore.FieldValue.serverTimestamp(),
                         isFull: false
-                    });
+                    })
                 console.log("Created new room for " + uuid);
                 return "Created new room for " + uuid;
             }
@@ -79,7 +79,7 @@ exports.match = () => functions.https.onRequest((request, response) => {
                             players: [uuid],
                             created: admin.firestore.FieldValue.serverTimestamp(),
                             isFull: false
-                        });
+                        })
                     console.log("Created new room for " + uuid);
                     return "Created new room for " + uuid;
                 }

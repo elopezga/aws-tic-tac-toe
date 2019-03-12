@@ -57,4 +57,58 @@ exports.getTurns = () => functions.https.onRequest((request, response) => {
     .catch( error => {
         response.send(error);
     });
-})
+});
+
+/* {
+    games: [{
+        gameid: '',
+        turn: ''
+    }],
+    rooms: ['']
+} */
+exports.getPlayerMenuInfo = () => functions.https.onRequest((request, response) => {
+    const uuid = request.query.uuid;
+
+    let processing = false;
+
+    db.collection('players')
+    .doc(uuid)
+    .get()
+    .then( snapshot => {
+        return response.send(JSON.stringify(snapshot.data()));
+        /* var games = snapshot.data().games;
+
+        var payload = {};
+        var gamesAttr = [];
+        var roomsAttr = snapshot.data().rooms; */
+        /* processing = true;
+        games.forEach( (gameid, index) => {
+            db.collection('games')
+            .doc(gameid)
+            .get()
+            .then( gamesnapshot => {
+                var gamedata = gamesnapshot.data();
+                gamesAttr.push({
+                    gameid: gamesnapshot.id,
+                    turn: gamedata.currentTurn
+                });
+
+                if (index === games.length-1)
+                {
+                    payload.games = gamesAttr;
+                    payload.rooms = roomsAttr;
+                    processing = false;
+                    return response.send(JSON.stringify(payload));
+                }
+
+                return;
+            })
+            .catch( error => {
+                console.log(error);
+            });
+        }); */
+    })
+    .catch( error => {
+        response.send(error);
+    });
+});

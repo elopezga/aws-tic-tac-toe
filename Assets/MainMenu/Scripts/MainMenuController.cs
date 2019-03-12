@@ -24,6 +24,7 @@ public class MainMenuController : MonoBehaviour
 
     private List<RoomData> roomsPlayerIsCurrentlyIn = new List<RoomData>();
     private List<GameTurnsData> gamesPlayerIsCurrentlyIn = new List<GameTurnsData>();
+    private PlayerMenuDataContainer currentPlayerMenuData;
     private float timeSinceLastGameCheckPollInSeconds = 0f;
     private bool isMakingRequest = false;
 
@@ -33,13 +34,13 @@ public class MainMenuController : MonoBehaviour
     private string getPlayerInfoEndpointFormat = "/getPlayerInfo?uuid={0}";
     private string getGameInfoEndpointFormat = "/getgameinfo?game={0}";
     private string getGameTurnsEndpointFormat = "/getturns?uuid={0}";
+    private string getPlayerMenuDataEndpointFormat = "/getPlayerMenuInfo?uuid={0}";
 
     // Start is called before the first frame update
     void Start()
     {
-        GetGameTurns();
-        // Todo: Get rooms from firebase message
         GetRooms();
+        GetPlayerMenu();
     }
 
     void Update()
@@ -50,8 +51,10 @@ public class MainMenuController : MonoBehaviour
         {
             if (!isMakingRequest)
             {
+                /* GetRooms();
+                GetGameTurns(); */
                 GetRooms();
-                GetGameTurns();
+                GetPlayerMenu();
                 timeSinceLastGameCheckPollInSeconds = 0f;
             }
         }
@@ -68,6 +71,36 @@ public class MainMenuController : MonoBehaviour
         StartCoroutine(MakeAPICall(
             apiCall,
             HandleNewGameSuccess,
+            (error) => {Debug.LogError(error);}
+        ));
+    }
+
+    private void GetPlayerMenu()
+    {
+        string apiEndpoint = apiEndpointHost + getPlayerMenuDataEndpointFormat;
+        string apiCall = string.Format(apiEndpoint, LoggedInUser.Instance.GetUserUID());
+
+        isMakingRequest = true;
+        StartCoroutine(MakeAPICall(
+            apiCall,
+            (response => {
+                PlayerMenuDataContainer playerMenuData = JsonUtility.FromJson<PlayerMenuDataContainer>(response);
+                // Update main menu only if the recieved data is diff from stored
+
+                if (currentPlayerMenuData == null)
+                {
+                    currentPlayerMenuData = playerMenuData;
+                }
+                else
+                {
+                    if (!currentPlayerMenuData.Equals(playerMenuData))
+                    {
+                        currentPlayerMenuData = playerMenuData;
+                        // Refresh
+                    }
+                }
+                isMakingRequest = false;
+            }),
             (error) => {Debug.LogError(error);}
         ));
     }
