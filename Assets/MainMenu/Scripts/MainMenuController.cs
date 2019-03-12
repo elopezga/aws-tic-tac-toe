@@ -22,8 +22,10 @@ public class MainMenuController : MonoBehaviour
     [SerializeField]
     private NewGameButtonController newGameButtonController;
 
-    private List<RoomData> roomsPlayerIsCurrentlyIn = new List<RoomData>();
+    private List<RoomData> roomsPlayerIsCurrentlyIn;
     private List<GameTurnsData> gamesPlayerIsCurrentlyIn = new List<GameTurnsData>();
+    private List<GameObject> findingPlayerButtons = new List<GameObject>();
+    private RoomsDataContainer[] roomsDataContainer;
     private PlayerMenuDataContainer currentPlayerMenuData;
     private float timeSinceLastGameCheckPollInSeconds = 0f;
     private bool isMakingRequest = false;
@@ -40,7 +42,7 @@ public class MainMenuController : MonoBehaviour
     void Start()
     {
         GetRooms();
-        GetPlayerMenu();
+        //GetPlayerMenu();
     }
 
     void Update()
@@ -54,7 +56,7 @@ public class MainMenuController : MonoBehaviour
                 /* GetRooms();
                 GetGameTurns(); */
                 GetRooms();
-                GetPlayerMenu();
+                //GetPlayerMenu();
                 timeSinceLastGameCheckPollInSeconds = 0f;
             }
         }
@@ -110,7 +112,7 @@ public class MainMenuController : MonoBehaviour
         string apiEndpoint = apiEndpointHost + getRoomsEndpointFormat;
         string apiCall = string.Format(apiEndpoint, LoggedInUser.Instance.GetUserUID());
 
-        RemoveAllFindingPlayers();
+        //RemoveAllFindingPlayers();
 
         StartCoroutine(MakeAPICall(
             apiCall,
@@ -165,9 +167,27 @@ public class MainMenuController : MonoBehaviour
 
     private void HandleGetRoomsSuccess(string response)
     {
-        List<RoomsDataContainer> rooms = new List<RoomsDataContainer>();
+        RoomsDataContainer[] roomsPayload = JsonHelper.DeserializeFromServer<RoomsDataContainer>(response);
+        
+        if (roomsDataContainer == null)
+        {
+            roomsDataContainer = roomsPayload;
+            UpdateRoomsView();
+        }
+        else if (roomsDataContainer.Length != roomsPayload.Length)
+        {
+            Debug.Log("Rooms payload not same size as cached rooms. Update cached rooms");
+            // Update
+            roomsDataContainer = roomsPayload;
+            // Update view
+            UpdateRoomsView();
 
-        GameObject findingPlayerPrefab = Resources.Load("FindingPlayerButton") as GameObject;
+        }
+        //List<RoomsDataContainer> rooms = new List<RoomsDataContainer>();
+
+        // Check if should update
+
+        /* GameObject findingPlayerPrefab = Resources.Load("FindingPlayerButton") as GameObject;
         
         RoomsDataContainer[] roomsData = JsonHelper.DeserializeFromServer<RoomsDataContainer>(response);
         foreach(RoomsDataContainer room in roomsData)
@@ -180,9 +200,28 @@ public class MainMenuController : MonoBehaviour
             RoomData roomData = findingPlayerButton.GetComponent<RoomData>();
             roomData.SetRoomData(room);
             roomsPlayerIsCurrentlyIn.Add(roomData);
-        }
+        } */
 
-        RefreshContent();
+    }
+
+    private void UpdateRoomsView()
+    {
+        if (roomsDataContainer != null)
+        {
+            GameObject findingPlayerPrefab = Resources.Load("FindingPlayerButton") as GameObject;
+            RemoveAllFindingPlayers();
+            foreach (RoomsDataContainer roomData in roomsDataContainer)
+            {
+                GameObject findingPlayerButton = Instantiate(findingPlayerPrefab);
+                Vector3 localScale = findingPlayerButton.transform.localScale;
+                findingPlayerButton.transform.SetParent(YourTurnSection.transform);
+                findingPlayerButton.transform.localScale = localScale;
+
+                findingPlayerButtons.Add(findingPlayerButton);
+            }
+
+            RefreshContent();
+        }
     }
 
     private void HandleGetPlayerInfoSuccess(string response)
@@ -232,13 +271,19 @@ public class MainMenuController : MonoBehaviour
 
     private void RemoveAllFindingPlayers()
     {
-        foreach(RoomData roomData in roomsPlayerIsCurrentlyIn)
+        foreach(GameObject roomButton in findingPlayerButtons)
+        {
+            Destroy(roomButton);
+        }
+
+        RefreshContent();
+        /* foreach(RoomData roomData in roomsPlayerIsCurrentlyIn)
         {
             Destroy(roomData.gameObject);
         }
         roomsPlayerIsCurrentlyIn.Clear();
 
-        RefreshContent();
+        RefreshContent(); */
     }
 
     private void RemoveAllGames()
