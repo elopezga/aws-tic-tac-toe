@@ -9,6 +9,7 @@ const getrooms = require('./getrooms');
 const startgame = require('./startgame');
 const getPlayerInfo = require('./getPlayerInfo');
 const getgameinfo = require('./getgameinfo');
+const createuser = require('./createuser');
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -24,3 +25,4 @@ exports.deletegame = startgame.deleteGameHttps();
 exports.getPlayerInfo = getPlayerInfo.getPlayerInfo();
 exports.getturns = getPlayerInfo.getTurns();
 exports.getgameinfo = getgameinfo.getgameinfo();
+exports.createuser = createuser.createuser();
