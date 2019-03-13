@@ -22,4 +22,9 @@ public class LoggedInUser : MonoBehaviour
     {
         return loggedInUser.UserId;
     }
+
+    public void Logout()
+    {
+        loggedInUser = null;
+    }
 }
