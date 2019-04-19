@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using Google;
 
@@ -13,6 +14,8 @@ public class LoginWithGoogle : MonoBehaviour
     private GoogleSignInConfiguration googleSignInConfiguration;
     private Firebase.Auth.FirebaseAuth authentication;
 
+    private bool logInSuccessful = false;
+
     void Awake()
     {
         googleSignInConfiguration = new GoogleSignInConfiguration
@@ -22,6 +25,14 @@ public class LoginWithGoogle : MonoBehaviour
         };
 
         authentication = Firebase.Auth.FirebaseAuth.DefaultInstance;
+    }
+
+    void Update()
+    {
+        if (logInSuccessful)
+        {
+            SceneManager.LoadScene("MainMenu/MainMenu");
+        }
     }
 
     public void SignIn()
@@ -48,6 +59,9 @@ public class LoginWithGoogle : MonoBehaviour
                 else
                 {
                     Firebase.Auth.FirebaseUser newUser = firebaseUserTask.Result.Result;
+                    LoggedInUser.Instance.SetLoggedInUser(newUser);
+                    LoggedInUser.Instance.SetAuth(authentication);
+                    logInSuccessful = true;
                 }
             });
         }
