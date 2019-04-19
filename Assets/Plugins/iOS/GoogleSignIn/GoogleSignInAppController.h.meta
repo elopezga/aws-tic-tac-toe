@@ -1,9 +1,8 @@
 fileFormatVersion: 2
-guid: 93324a471a6d44bb8297d17d8b191e52
+guid: ce40e3e7b37a54617a4683dfc0479c71
 labels:
 - gvh
-- gvh_dotnet-3.5
-- gvh_version-5.5.0
+- gvh_version-1.0.4
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -26,11 +25,10 @@ PluginImporter:
       settings:
         DefaultValueInitialized: true
   - first:
-      Windows Store Apps: WindowsStoreApps
+      iPhone: iOS
     second:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
+      enabled: 1
+      settings: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 

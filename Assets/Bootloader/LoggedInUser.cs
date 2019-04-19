@@ -1,10 +1,12 @@
 using UnityEngine;
 
+
 public class LoggedInUser : MonoBehaviour
 {
     public static LoggedInUser Instance = null;
 
     private Firebase.Auth.FirebaseUser loggedInUser = null;
+    private Firebase.Auth.FirebaseAuth auth = null;
 
     void Awake()
     {
@@ -18,6 +20,11 @@ public class LoggedInUser : MonoBehaviour
         loggedInUser = user;
     }
 
+    public void SetAuth(Firebase.Auth.FirebaseAuth auth)
+    {
+        this.auth = auth;
+    }
+
     public string GetUserUID()
     {
         return loggedInUser.UserId;
@@ -25,6 +32,11 @@ public class LoggedInUser : MonoBehaviour
 
     public void Logout()
     {
+        if (loggedInUser != null)
+        {
+            auth.SignOut();
+        }
+        Google.GoogleSignIn.DefaultInstance.SignOut();
         loggedInUser = null;
     }
 }
