@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
 using Google;
 
@@ -13,6 +15,8 @@ public class LoginWithGoogle : MonoBehaviour
 
     private GoogleSignInConfiguration googleSignInConfiguration;
     private Firebase.Auth.FirebaseAuth authentication;
+
+    private string createGoogleUserEndpoint = "https://us-central1-aws-tic-tac-toe.cloudfunctions.net/createGoogleUser?uuid={0}";
 
     private bool logInSuccessful = false;
 
@@ -59,9 +63,20 @@ public class LoginWithGoogle : MonoBehaviour
                 else
                 {
                     Firebase.Auth.FirebaseUser newUser = firebaseUserTask.Result.Result;
-                    LoggedInUser.Instance.SetLoggedInUser(newUser);
-                    LoggedInUser.Instance.SetAuth(authentication);
-                    logInSuccessful = true;
+                    
+                    string apiCall = string.Format(createGoogleUserEndpoint, newUser.UserId);
+                    StartCoroutine(MakeAPICall(apiCall,
+                    status => {
+                        if (status == "true")
+                        {
+                            LoggedInUser.Instance.SetLoggedInUser(newUser);
+                            LoggedInUser.Instance.SetAuth(authentication);
+                            logInSuccessful = true;
+                        }
+                    },
+                    status => {
+                        Debug.LogError("Something went wrong :(");
+                    }));
                 }
             });
         }
@@ -70,6 +85,22 @@ public class LoginWithGoogle : MonoBehaviour
             Debug.LogError(e);
         }
         
+    }
+
+    private IEnumerator MakeAPICall(string apiCall, Action<string> onSuccess, Action<string> onFail)
+    {
+        Debug.Log("Making api call to " + apiCall);
+        UnityWebRequest apiRequest = UnityWebRequest.Get(apiCall);
+        yield return apiRequest.SendWebRequest();
+
+        if (apiRequest.isNetworkError || apiRequest.isHttpError)
+        {
+            onFail(apiRequest.error);
+        }
+        else
+        {
+            onSuccess(apiRequest.downloadHandler.text);
+        }
     }
 
     private Firebase.Auth.Credential GetFirebaseCredential(Task<string> googleIdTokenTask)

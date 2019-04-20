@@ -27,3 +27,4 @@ exports.getturns = getPlayerInfo.getTurns();
 exports.getPlayerMenuInfo = getPlayerInfo.getPlayerMenuInfo();
 exports.getgameinfo = getgameinfo.getgameinfo();
 exports.createuser = createuser.createuser();
+exports.createGoogleUser = createuser.createGoogleUser();
