@@ -9,6 +9,9 @@ public class MatchController : MonoBehaviour
     [SerializeField]
     private LoadingController loadingController;
 
+    [SerializeField]
+    private GridController gridController;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,9 +23,17 @@ public class MatchController : MonoBehaviour
         // On match info recieved, hide loading screen
     }
 
-    private void OnSuccess(string message)
+    private void OnSuccess(string payload)
     {
+        //Debug.Log(payload);
         loadingController.Hide();
+        MatchPayload matchPayload = JsonUtility.FromJson<MatchPayload>(payload);
+
+        gridController.SetState(new GridState(){
+            bottomRow = matchPayload.gameState.bottomRow,
+            middleRow = matchPayload.gameState.middleRow,
+            topRow = matchPayload.gameState.topRow
+        });
     }
 
     private void OnFail(string message)
@@ -33,24 +44,24 @@ public class MatchController : MonoBehaviour
     private string GetMockMatchPayload()
     {
         return @"{
-            currentTurn: "",
-            xOwner: "",
-            oOwner: "",
-            gameState: {
-                bottomRow: [
-                    {ownerid: "", piece: ""},
-                    {ownerid: "", piece: ""},
-                    {ownerid: "", piece: ""}
+            ""currentTurn"": ""ME"",
+            ""xOwner"": ""ME"",
+            ""oOwner"": ""YOU"",
+            ""gameState"": {
+                ""bottomRow"": [
+                    {""ownerid"": ""ME"", ""piece"": ""X""},
+                    {""ownerid"": """", ""piece"": ""O""},
+                    {""ownerid"": """", ""piece"": ""O""}
                 ],
-                middleRow: [
-                    {ownerid: "", piece: ""},
-                    {ownerid: "", piece: ""},
-                    {ownerid: "", piece: ""}
+                ""middleRow"": [
+                    {""ownerid"": """", ""piece"": ""-""},
+                    {""ownerid"": """", ""piece"": ""X""},
+                    {""ownerid"": """", ""piece"": ""O""}
                 ],
-                topRow: [
-                    {ownerid: "", piece: ""},
-                    {ownerid: "", piece: ""},
-                    {ownerid: "", piece: ""}
+                ""topRow"": [
+                    {""ownerid"": """", ""piece"": ""-""},
+                    {""ownerid"": """", ""piece"": ""-""},
+                    {""ownerid"": """", ""piece"": ""-""}
                 ]
             }
         }";
