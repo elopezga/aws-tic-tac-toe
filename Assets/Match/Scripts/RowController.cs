@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class RowController : MonoBehaviour
 {
+    public Action OnPiecePlaced;
+
     [SerializeField]
     private CellController LeftCell;
 
@@ -14,6 +17,25 @@ public class RowController : MonoBehaviour
     private CellController RightCell;
 
     private RowState state;
+
+    void Start()
+    {
+        LeftCell.OnPiecePlaced += OnPiecePlaced;
+        MiddleCell.OnPiecePlaced += OnPiecePlaced;
+        RightCell.OnPiecePlaced += OnPiecePlaced;
+    }
+
+    void OnDestroy()
+    {
+        LeftCell.OnPiecePlaced -= OnPiecePlaced;
+        MiddleCell.OnPiecePlaced -= OnPiecePlaced;
+        RightCell.OnPiecePlaced -= OnPiecePlaced;
+    }
+
+    private void Asshole()
+    {
+        Debug.Log("Asshole");
+    }
 
     public void DisablePlacingPiece()
     {

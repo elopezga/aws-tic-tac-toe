@@ -20,7 +20,17 @@ public class MatchController : MonoBehaviour
         // Start api call to get match info
         StartCoroutine(MakeApiCall("", OnSuccess, OnFail));
 
-        // On match info recieved, hide loading screen
+        gridController.OnPiecePlaced += DoSomething;
+    }
+
+    void OnDestroy()
+    {
+        gridController.OnPiecePlaced -= DoSomething;
+    }
+
+    private void DoSomething()
+    {
+        Debug.Log("YOOOO place was pieced");
     }
 
     private void OnSuccess(string payload)

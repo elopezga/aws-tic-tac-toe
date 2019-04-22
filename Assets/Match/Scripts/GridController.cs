@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GridController : MonoBehaviour
 {
+    public Action OnPiecePlaced;
+
     [SerializeField]
     private RowController bottomRow;
     [SerializeField]
@@ -12,6 +15,20 @@ public class GridController : MonoBehaviour
     private RowController topRow;
 
     private GridState state;
+
+    void Start()
+    {
+        bottomRow.OnPiecePlaced += OnPiecePlaced;
+        middleRow.OnPiecePlaced += OnPiecePlaced;
+        topRow.OnPiecePlaced += OnPiecePlaced;
+    }
+
+    void OnDestroy()
+    {
+        bottomRow.OnPiecePlaced -= OnPiecePlaced;
+        middleRow.OnPiecePlaced -= OnPiecePlaced;
+        topRow.OnPiecePlaced -= OnPiecePlaced;
+    }
 
     public void DisablePlacingPiece()
     {
