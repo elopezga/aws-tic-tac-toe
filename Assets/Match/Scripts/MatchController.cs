@@ -20,17 +20,19 @@ public class MatchController : MonoBehaviour
         // Start api call to get match info
         StartCoroutine(MakeApiCall("", OnSuccess, OnFail));
 
-        gridController.OnPiecePlaced += DoSomething;
+        gridController.OnPiecePlaced += HandlePiecePlaced;
     }
 
     void OnDestroy()
     {
-        gridController.OnPiecePlaced -= DoSomething;
+        gridController.OnPiecePlaced -= HandlePiecePlaced;
     }
 
-    private void DoSomething()
+    private void HandlePiecePlaced()
     {
-        Debug.Log("YOOOO place was pieced");
+        gridController.DisablePlacingPiece();
+
+        Debug.Log("TODO: Send API Request");
     }
 
     private void OnSuccess(string payload)
