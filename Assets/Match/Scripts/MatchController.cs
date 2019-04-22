@@ -25,15 +25,47 @@ public class MatchController : MonoBehaviour
 
     private void OnSuccess(string payload)
     {
-        //Debug.Log(payload);
         loadingController.Hide();
         MatchPayload matchPayload = JsonUtility.FromJson<MatchPayload>(payload);
 
         gridController.SetState(new GridState(){
             bottomRow = matchPayload.gameState.bottomRow,
             middleRow = matchPayload.gameState.middleRow,
-            topRow = matchPayload.gameState.topRow
+            topRow = matchPayload.gameState.topRow,
+            currentTurnId = matchPayload.currentTurn,
+            currentTurnPiece = GetCurrentTurnPiece(matchPayload)
         });
+
+        if (isYourTurn(matchPayload))
+        {
+            gridController.EnablePlacingPiece();
+        }
+        else
+        {
+            gridController.DisablePlacingPiece();
+        }
+    }
+
+    private string GetCurrentTurnPiece(MatchPayload payload)
+    {
+        string piece = "";
+
+        if (payload.currentTurn == payload.oOwner)
+        {
+            piece = "O";
+        }
+        else
+        {
+            piece = "X";
+        }
+
+        return piece;
+    }
+
+    private bool isYourTurn(MatchPayload payload)
+    {
+        return true;
+        //return payload.currentTurn == LoggedInUser.Instance.GetUserUID();
     }
 
     private void OnFail(string message)
@@ -50,13 +82,13 @@ public class MatchController : MonoBehaviour
             ""gameState"": {
                 ""bottomRow"": [
                     {""ownerid"": ""ME"", ""piece"": ""X""},
-                    {""ownerid"": """", ""piece"": ""O""},
-                    {""ownerid"": """", ""piece"": ""O""}
+                    {""ownerid"": ""YOU"", ""piece"": ""O""},
+                    {""ownerid"": ""YOU"", ""piece"": ""O""}
                 ],
                 ""middleRow"": [
                     {""ownerid"": """", ""piece"": ""-""},
-                    {""ownerid"": """", ""piece"": ""X""},
-                    {""ownerid"": """", ""piece"": ""O""}
+                    {""ownerid"": ""ME"", ""piece"": ""X""},
+                    {""ownerid"": ""YOU"", ""piece"": ""O""}
                 ],
                 ""topRow"": [
                     {""ownerid"": """", ""piece"": ""-""},

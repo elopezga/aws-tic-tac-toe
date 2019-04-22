@@ -15,26 +15,18 @@ public class RowController : MonoBehaviour
 
     private RowState state;
 
-    // Start is called before the first frame update
-    void Start()
+    public void DisablePlacingPiece()
     {
-        /* CellState state = new CellState()
-        {
-            PlayerPiece = "",
-            DisplayPiece = ""
-        };
-
-        CellController cellController = new CellController();
-        cellController.SetState(new CellState(){
-            PlayerPiece = "",
-            DisplayPiece = ""
-        }); */
+        LeftCell.DisablePlacingPiece();
+        MiddleCell.DisablePlacingPiece();
+        RightCell.DisablePlacingPiece();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void EnablePlacingPiece()
     {
-        
+        LeftCell.EnablePlacingPiece();
+        MiddleCell.EnablePlacingPiece();
+        RightCell.EnablePlacingPiece();
     }
 
     public void SetState(RowState state)
@@ -43,17 +35,26 @@ public class RowController : MonoBehaviour
 
         LeftCell.SetState(new CellState(){
             PlayerPiece = state.leftCell.piece,
-            DisplayPiece = state.leftCell.piece
+            DisplayPiece = state.leftCell.piece,
+            OwnerId = state.leftCell.ownerid,
+            CurrentTurnId = state.currentTurnId,
+            CurrentTurnPiece = state.currentTurnPiece
         });
 
         MiddleCell.SetState(new CellState(){
             PlayerPiece = state.middleCell.piece,
-            DisplayPiece = state.middleCell.piece
+            DisplayPiece = state.middleCell.piece,
+            OwnerId = state.middleCell.ownerid,
+            CurrentTurnId = state.currentTurnId,
+            CurrentTurnPiece = state.currentTurnPiece
         });
 
         RightCell.SetState(new CellState(){
             PlayerPiece = state.rightCell.piece,
-            DisplayPiece = state.rightCell.piece
+            DisplayPiece = state.rightCell.piece,
+            OwnerId = state.rightCell.ownerid,
+            CurrentTurnId = state.currentTurnId,
+            CurrentTurnPiece = state.currentTurnPiece
         });
     }
 }
@@ -64,4 +65,6 @@ public class RowState
     public CellStatePayload leftCell;
     public CellStatePayload middleCell;
     public CellStatePayload rightCell;
+    public string currentTurnId;
+    public string currentTurnPiece;
 }
