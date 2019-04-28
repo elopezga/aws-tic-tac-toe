@@ -10,6 +10,9 @@ public class MatchController : MonoBehaviour
     private LoadingController loadingController;
 
     [SerializeField]
+    private TurnController turnController;
+
+    [SerializeField]
     private GridController gridController;
 
     // Start is called before the first frame update
@@ -31,6 +34,7 @@ public class MatchController : MonoBehaviour
     private void HandlePiecePlaced()
     {
         gridController.DisablePlacingPiece();
+        turnController.SetOpponentTurn();
 
         Debug.Log("TODO: Send API Request");
     }
@@ -39,6 +43,11 @@ public class MatchController : MonoBehaviour
     {
         loadingController.Hide();
         MatchPayload matchPayload = JsonUtility.FromJson<MatchPayload>(payload);
+
+        turnController.SetState(new TurnState(){
+            CurrentTurn = matchPayload.currentTurn,
+            CurrentTurnPiece = (matchPayload.currentTurn == matchPayload.xOwner) ? "X" : "O"
+        });
 
         gridController.SetState(new GridState(){
             bottomRow = matchPayload.gameState.bottomRow,
