@@ -16,6 +16,7 @@ public class MatchController : MonoBehaviour
     private GridController gridController;
 
     private string apiEndpointHost = "https://us-central1-aws-tic-tac-toe.cloudfunctions.net";
+    private string getGameStateEndpointFormat = "/getgameinfo?game={0}";
     private string setGameStateEndpointFormat = "/setgamestate?gameuuid={0}";
 
     // Start is called before the first frame update
@@ -24,7 +25,10 @@ public class MatchController : MonoBehaviour
         loadingController.Show();
 
         // Start api call to get match info
-        StartCoroutine(MakeApiCall("", OnSuccess, OnFail));
+        string apiEndpoint = apiEndpointHost + getGameStateEndpointFormat;
+        string apiCall = string.Format(apiEndpoint, "2GznDkSGIj626vq4hKvJ");
+
+        StartCoroutine(MakeApiCall(apiCall, HandleStartGame, ErrorStartingGame));
 
         gridController.OnStateUpdate += HandlePiecePlaced; // State change happens when piece is placed;
     }
@@ -32,6 +36,40 @@ public class MatchController : MonoBehaviour
     void OnDestroy()
     {
         gridController.OnStateUpdate -= HandlePiecePlaced;
+    }
+
+    private void HandleStartGame(string payload)
+    {
+        MatchPayload match = JsonUtility.FromJson<MatchPayload>(payload);
+
+        loadingController.Hide();
+
+        turnController.SetState(new TurnState(){
+            CurrentTurn = match.currentTurn,
+            CurrentTurnPiece = (match.currentTurn == match.xOwner) ? "X" : "O"
+        });
+
+        gridController.SetState(new GridState(){
+            bottomRow = match.gameState.bottomRow,
+            middleRow = match.gameState.middleRow,
+            topRow = match.gameState.topRow,
+            currentTurnId = match.currentTurn,
+            currentTurnPiece = GetCurrentTurnPiece(match)
+        });
+
+        if (isYourTurn(match))
+        {
+            gridController.EnablePlacingPiece();
+        }
+        else
+        {
+            gridController.DisablePlacingPiece();
+        }
+    }
+
+    private void ErrorStartingGame(string error)
+    {
+        Debug.Log(error);
     }
 
     private void HandlePiecePlaced()
@@ -45,42 +83,17 @@ public class MatchController : MonoBehaviour
 
         string payload = gridController.GetStateSerialized();
 
-        Debug.Log(gridController.GetStateSerialized());
-
-        Debug.Log("TODO: Send API Request");
-        StartCoroutine(MakeApiPostCall(apiCall, payload, (msg) => {
-            Debug.Log("Success: " + msg);
-        }, (msg) => {
-            Debug.Log("Too bad: " + msg);
-        }));
+        StartCoroutine(MakeApiPostCall(apiCall, payload, SendGameStateSuccess, SendGameStateFail));
     }
 
-    private void OnSuccess(string payload)
+    private void SendGameStateSuccess(string message)
     {
-        loadingController.Hide();
-        MatchPayload matchPayload = JsonUtility.FromJson<MatchPayload>(payload);
+        Debug.Log("Success: " + message);
+    }
 
-        turnController.SetState(new TurnState(){
-            CurrentTurn = matchPayload.currentTurn,
-            CurrentTurnPiece = (matchPayload.currentTurn == matchPayload.xOwner) ? "X" : "O"
-        });
-
-        gridController.SetState(new GridState(){
-            bottomRow = matchPayload.gameState.bottomRow,
-            middleRow = matchPayload.gameState.middleRow,
-            topRow = matchPayload.gameState.topRow,
-            currentTurnId = matchPayload.currentTurn,
-            currentTurnPiece = GetCurrentTurnPiece(matchPayload)
-        });
-
-        if (isYourTurn(matchPayload))
-        {
-            gridController.EnablePlacingPiece();
-        }
-        else
-        {
-            gridController.DisablePlacingPiece();
-        }
+    private void SendGameStateFail(string message)
+    {
+        Debug.Log("Fail:" + message);
     }
 
     private string GetCurrentTurnPiece(MatchPayload payload)
@@ -101,13 +114,9 @@ public class MatchController : MonoBehaviour
 
     private bool isYourTurn(MatchPayload payload)
     {
+        // TODO
         return true;
         //return payload.currentTurn == LoggedInUser.Instance.GetUserUID();
-    }
-
-    private void OnFail(string message)
-    {
-
     }
 
     private string GetMockMatchPayload()
@@ -158,12 +167,19 @@ public class MatchController : MonoBehaviour
 
     private IEnumerator MakeApiCall(string apiEndpoint, Action<string> onSuccess, Action<string> onFail)
     {
-        yield return new WaitForSeconds(1);
-        onSuccess.Invoke(GetMockMatchPayload());
+        using (UnityWebRequest www = UnityWebRequest.Get(apiEndpoint))
+        {
+            yield return www.SendWebRequest();
 
-        /* Debug.Log("Making api call to " + apiEndpoint);
-        UnityWebRequest apiRequest = UnityWebRequest.Get(apiEndpoint); */
-        
+            if (www.isNetworkError || www.isHttpError)
+            {
+                onFail(www.error);
+            }
+            else
+            {
+                onSuccess(www.downloadHandler.text);
+            }
+        }
     }
 }
 
