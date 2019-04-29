@@ -15,6 +15,9 @@ public class MatchController : MonoBehaviour
     [SerializeField]
     private GridController gridController;
 
+    private string apiEndpointHost = "https://us-central1-aws-tic-tac-toe.cloudfunctions.net";
+    private string setGameStateEndpointFormat = "/setgamestate?gameuuid={0}";
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,18 +26,24 @@ public class MatchController : MonoBehaviour
         // Start api call to get match info
         StartCoroutine(MakeApiCall("", OnSuccess, OnFail));
 
-        gridController.OnPiecePlaced += HandlePiecePlaced;
+        gridController.OnStateUpdate += HandlePiecePlaced; // State change happens when piece is placed;
     }
 
     void OnDestroy()
     {
-        gridController.OnPiecePlaced -= HandlePiecePlaced;
+        gridController.OnStateUpdate -= HandlePiecePlaced;
     }
 
     private void HandlePiecePlaced()
     {
+        // State change happens when piece is placed;
         gridController.DisablePlacingPiece();
         turnController.SetOpponentTurn();
+
+        string apiEndpoint = apiEndpointHost + setGameStateEndpointFormat;
+        string apiCall = string.Format(apiEndpoint, "2GznDkSGIj626vq4hKvJ");
+
+        Debug.Log(gridController.GetStateSerialized());
 
         Debug.Log("TODO: Send API Request");
     }
@@ -124,6 +133,10 @@ public class MatchController : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         onSuccess.Invoke(GetMockMatchPayload());
+
+        /* Debug.Log("Making api call to " + apiEndpoint);
+        UnityWebRequest apiRequest = UnityWebRequest.Get(apiEndpoint); */
+        
     }
 }
 

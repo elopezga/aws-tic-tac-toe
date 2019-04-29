@@ -6,6 +6,7 @@ using UnityEngine;
 public class GridController : MonoBehaviour
 {
     public Action OnPiecePlaced;
+    public Action OnStateUpdate;
 
     [SerializeField]
     private RowController bottomRow;
@@ -21,6 +22,10 @@ public class GridController : MonoBehaviour
         bottomRow.OnPiecePlaced += OnPiecePlaced;
         middleRow.OnPiecePlaced += OnPiecePlaced;
         topRow.OnPiecePlaced += OnPiecePlaced;
+
+        bottomRow.OnStateUpdate += UpdateState;
+        middleRow.OnStateUpdate += UpdateState;
+        topRow.OnStateUpdate += UpdateState;
     }
 
     void OnDestroy()
@@ -28,6 +33,10 @@ public class GridController : MonoBehaviour
         bottomRow.OnPiecePlaced -= OnPiecePlaced;
         middleRow.OnPiecePlaced -= OnPiecePlaced;
         topRow.OnPiecePlaced -= OnPiecePlaced;
+
+        bottomRow.OnStateUpdate -= UpdateState;
+        middleRow.OnStateUpdate -= UpdateState;
+        topRow.OnStateUpdate -= UpdateState;
     }
 
     public void DisablePlacingPiece()
@@ -71,6 +80,22 @@ public class GridController : MonoBehaviour
             currentTurnId = state.currentTurnId,
             currentTurnPiece = state.currentTurnPiece
         });
+    }
+
+    public string GetStateSerialized()
+    {
+        return JsonUtility.ToJson(state);
+    }
+
+    private void UpdateState()
+    {
+        state.bottomRow = new CellStatePayload[]{bottomRow.state.leftCell, bottomRow.state.middleCell, bottomRow.state.rightCell};
+        state.middleRow = new CellStatePayload[]{middleRow.state.leftCell, middleRow.state.middleCell, middleRow.state.rightCell};
+        state.topRow = new CellStatePayload[]{topRow.state.leftCell, topRow.state.middleCell, topRow.state.rightCell};
+
+        // TODO: update currentTurn info here or at server
+
+        OnStateUpdate.Invoke();
     }
 }
 

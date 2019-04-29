@@ -15,7 +15,7 @@ public class CellController : MonoBehaviour
     [SerializeField]
     private string DefaultDisplayText = "";
 
-    private CellState state;
+    public CellState state;
 
     private Button button;
 

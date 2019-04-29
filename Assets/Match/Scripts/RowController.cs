@@ -6,6 +6,7 @@ using UnityEngine;
 public class RowController : MonoBehaviour
 {
     public Action OnPiecePlaced;
+    public Action OnStateUpdate;
 
     [SerializeField]
     private CellController LeftCell;
@@ -16,13 +17,17 @@ public class RowController : MonoBehaviour
     [SerializeField]
     private CellController RightCell;
 
-    private RowState state;
+    public RowState state;
 
     void Start()
     {
         LeftCell.OnPiecePlaced += OnPiecePlaced;
         MiddleCell.OnPiecePlaced += OnPiecePlaced;
         RightCell.OnPiecePlaced += OnPiecePlaced;
+
+        LeftCell.OnPiecePlaced += UpdateState;
+        MiddleCell.OnPiecePlaced += UpdateState;
+        RightCell.OnPiecePlaced += UpdateState;
     }
 
     void OnDestroy()
@@ -30,11 +35,10 @@ public class RowController : MonoBehaviour
         LeftCell.OnPiecePlaced -= OnPiecePlaced;
         MiddleCell.OnPiecePlaced -= OnPiecePlaced;
         RightCell.OnPiecePlaced -= OnPiecePlaced;
-    }
 
-    private void Asshole()
-    {
-        Debug.Log("Asshole");
+        LeftCell.OnPiecePlaced -= OnPiecePlaced;
+        MiddleCell.OnPiecePlaced -= OnPiecePlaced;
+        RightCell.OnPiecePlaced -= OnPiecePlaced;
     }
 
     public void DisablePlacingPiece()
@@ -79,6 +83,22 @@ public class RowController : MonoBehaviour
             CurrentTurnPiece = state.currentTurnPiece
         });
     }
+
+    private void UpdateState()
+    {
+        state.leftCell.ownerid = LeftCell.state.OwnerId;
+        state.leftCell.piece = LeftCell.state.PlayerPiece;
+
+        state.middleCell.ownerid = MiddleCell.state.OwnerId;
+        state.middleCell.piece = MiddleCell.state.PlayerPiece;
+
+        state.rightCell.ownerid = RightCell.state.OwnerId;
+        state.rightCell.piece = RightCell.state.PlayerPiece;
+
+        OnStateUpdate.Invoke();
+    }
+
+
 }
 
 
