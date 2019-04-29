@@ -43,9 +43,16 @@ public class MatchController : MonoBehaviour
         string apiEndpoint = apiEndpointHost + setGameStateEndpointFormat;
         string apiCall = string.Format(apiEndpoint, "2GznDkSGIj626vq4hKvJ");
 
+        string payload = gridController.GetStateSerialized();
+
         Debug.Log(gridController.GetStateSerialized());
 
         Debug.Log("TODO: Send API Request");
+        StartCoroutine(MakeApiPostCall(apiCall, payload, (msg) => {
+            Debug.Log("Success: " + msg);
+        }, (msg) => {
+            Debug.Log("Too bad: " + msg);
+        }));
     }
 
     private void OnSuccess(string payload)
@@ -127,6 +134,26 @@ public class MatchController : MonoBehaviour
                 ]
             }
         }";
+    }
+
+    private IEnumerator MakeApiPostCall(string apiTarget, string payload, Action<string> onSuccess, Action<string> onFail)
+    {
+        byte[] payloadAsBytes = System.Text.Encoding.UTF8.GetBytes(payload);
+        
+        using (UnityWebRequest www = UnityWebRequest.Put(apiTarget, payloadAsBytes))
+        {
+            www.SetRequestHeader("Content-Type", "application/json");
+            yield return www.Send();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                onFail(www.error);
+            }
+            else
+            {
+                onSuccess(www.downloadHandler.text);
+            }
+        }
     }
 
     private IEnumerator MakeApiCall(string apiEndpoint, Action<string> onSuccess, Action<string> onFail)
