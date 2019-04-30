@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour
 {
@@ -287,6 +288,12 @@ public class MainMenuController : MonoBehaviour
             foreach (PlayerMenuGamesDataContainer game in currentPlayerMenuData.games)
             {
                 GameObject gameButton = Instantiate(gameButtonPrefab);
+                GameButtonController controller = gameButton.GetComponent<GameButtonController>();
+                controller.OnClick += (gameid) => {
+                    LoggedInUser.Instance.currentGameId = gameid;
+                    SceneManager.LoadScene("Match/Match");
+                };
+                controller.GameId = game.gameid;
                 Vector3 localScale = gameButton.transform.localScale;
 
                 if (game.turn == LoggedInUser.Instance.GetUserUID())

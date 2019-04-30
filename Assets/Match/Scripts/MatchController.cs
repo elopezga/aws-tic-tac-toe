@@ -24,9 +24,11 @@ public class MatchController : MonoBehaviour
     {
         loadingController.Show();
 
+        Debug.Log(LoggedInUser.Instance.currentGameId);
+
         // Start api call to get match info
         string apiEndpoint = apiEndpointHost + getGameStateEndpointFormat;
-        string apiCall = string.Format(apiEndpoint, "2GznDkSGIj626vq4hKvJ");
+        string apiCall = string.Format(apiEndpoint, LoggedInUser.Instance.currentGameId);
 
         StartCoroutine(MakeApiCall(apiCall, HandleStartGame, ErrorStartingGame));
 
@@ -45,7 +47,7 @@ public class MatchController : MonoBehaviour
         loadingController.Hide();
 
         turnController.SetState(new TurnState(){
-            CurrentTurn = match.currentTurnId,
+            CurrentTurn = (match.currentTurnId == LoggedInUser.Instance.GetUserUID()) ? "Your Turn" : "Opponent Turn",
             CurrentTurnPiece = (match.currentTurnId == match.xOwner) ? "X" : "O"
         });
 
@@ -79,7 +81,7 @@ public class MatchController : MonoBehaviour
         turnController.SetOpponentTurn();
 
         string apiEndpoint = apiEndpointHost + setGameStateEndpointFormat;
-        string apiCall = string.Format(apiEndpoint, "2GznDkSGIj626vq4hKvJ");
+        string apiCall = string.Format(apiEndpoint, LoggedInUser.Instance.currentGameId);
 
         string payload = gridController.GetStateSerialized();
 
@@ -114,9 +116,7 @@ public class MatchController : MonoBehaviour
 
     private bool isYourTurn(MatchPayload payload)
     {
-        // TODO
-        return true;
-        //return payload.currentTurn == LoggedInUser.Instance.GetUserUID();
+        return payload.currentTurnId == LoggedInUser.Instance.GetUserUID();
     }
 
     private string GetMockMatchPayload()
