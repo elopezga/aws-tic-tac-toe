@@ -45,15 +45,15 @@ public class MatchController : MonoBehaviour
         loadingController.Hide();
 
         turnController.SetState(new TurnState(){
-            CurrentTurn = match.currentTurn,
-            CurrentTurnPiece = (match.currentTurn == match.xOwner) ? "X" : "O"
+            CurrentTurn = match.currentTurnId,
+            CurrentTurnPiece = (match.currentTurnId == match.xOwner) ? "X" : "O"
         });
 
         gridController.SetState(new GridState(){
             bottomRow = match.gameState.bottomRow,
             middleRow = match.gameState.middleRow,
             topRow = match.gameState.topRow,
-            currentTurnId = match.currentTurn,
+            currentTurnId = match.currentTurnId,
             currentTurnPiece = GetCurrentTurnPiece(match)
         });
 
@@ -100,7 +100,7 @@ public class MatchController : MonoBehaviour
     {
         string piece = "";
 
-        if (payload.currentTurn == payload.oOwner)
+        if (payload.currentTurnId == payload.oOwner)
         {
             piece = "O";
         }
@@ -186,7 +186,7 @@ public class MatchController : MonoBehaviour
 [System.Serializable]
 public class MatchPayload
 {
-    public string currentTurn;
+    public string currentTurnId;
     public string xOwner;
     public string oOwner;
     public GameStatePayload gameState; 

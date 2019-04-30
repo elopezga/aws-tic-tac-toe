@@ -49,7 +49,9 @@ exports.startGame = function(owner, joiner)
     return db.collection('games')
         .add({
             players: [owner, joiner],
-            currentTurn: owner,
+            currentTurnId: owner,
+            xOwner: owner,
+            oOwner: joiner,
             gameState: {
                 topRow: createEmptyRow(),
                 middleRow: createEmptyRow(),

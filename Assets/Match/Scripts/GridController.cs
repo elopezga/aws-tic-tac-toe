@@ -84,7 +84,58 @@ public class GridController : MonoBehaviour
 
     public string GetStateSerialized()
     {
-        return JsonUtility.ToJson(state);
+        CellStatePayload[] bottomRow = new CellStatePayload[] {
+            new CellStatePayload(){
+                ownerid = this.bottomRow.state.leftCell.ownerid,
+                piece = this.bottomRow.state.leftCell.piece
+            },
+            new CellStatePayload(){
+                ownerid = this.bottomRow.state.middleCell.ownerid,
+                piece = this.bottomRow.state.middleCell.piece
+            },
+            new CellStatePayload(){
+                ownerid = this.bottomRow.state.rightCell.ownerid,
+                piece = this.bottomRow.state.rightCell.piece
+            }
+        };
+
+        CellStatePayload[] middleRow = new CellStatePayload[]{
+            new CellStatePayload(){
+                ownerid = this.middleRow.state.leftCell.ownerid,
+                piece = this.middleRow.state.leftCell.piece
+            },
+            new CellStatePayload(){
+                ownerid = this.middleRow.state.middleCell.ownerid,
+                piece = this.middleRow.state.middleCell.piece
+            },
+            new CellStatePayload(){
+                ownerid = this.middleRow.state.rightCell.ownerid,
+                piece = this.middleRow.state.rightCell.piece
+            }
+        };
+
+        CellStatePayload[] topRow = new CellStatePayload[]{
+            new CellStatePayload(){
+                ownerid = this.topRow.state.leftCell.ownerid,
+                piece = this.topRow.state.leftCell.piece
+            },
+            new CellStatePayload(){
+                ownerid = this.topRow.state.middleCell.ownerid,
+                piece = this.topRow.state.middleCell.piece
+            },
+            new CellStatePayload(){
+                ownerid = this.topRow.state.rightCell.ownerid,
+                piece = this.topRow.state.rightCell.piece
+            }
+        };
+
+        GameStatePayload payload = new GameStatePayload()
+        {
+            bottomRow = bottomRow,
+            middleRow = middleRow,
+            topRow = topRow
+        };
+        return JsonUtility.ToJson(payload);
     }
 
     private void UpdateState()
