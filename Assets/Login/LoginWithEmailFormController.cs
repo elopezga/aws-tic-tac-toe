@@ -10,7 +10,7 @@ public class LoginWithEmailFormController : MonoBehaviour
     private Text email;
 
     [SerializeField]
-    private Text password;
+    private InputField password;
 
     private Firebase.Auth.FirebaseAuth auth;
 
