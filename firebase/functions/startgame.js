@@ -52,6 +52,8 @@ exports.startGame = function(owner, joiner)
             currentTurnId: owner,
             xOwner: owner,
             oOwner: joiner,
+            winner: "",
+            draw: false,
             gameState: {
                 topRow: createEmptyRow(),
                 middleRow: createEmptyRow(),

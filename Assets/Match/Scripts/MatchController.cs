@@ -46,9 +46,24 @@ public class MatchController : MonoBehaviour
 
         loadingController.Hide();
 
+        string currentTurnDisplay = "";
+        string currentTurnPieceDisplay = "";
+        if (string.IsNullOrEmpty(match.winner) && match.draw == false)
+        {
+            currentTurnDisplay = (match.currentTurnId == LoggedInUser.Instance.GetUserUID()) ? "Your Turn" : "Opponent Turn";
+            currentTurnPieceDisplay = (match.currentTurnId == match.xOwner) ? "X" : "O";
+        }
+        else if (!string.IsNullOrEmpty(match.winner))
+        {
+            currentTurnDisplay = (match.winner == LoggedInUser.Instance.GetUserUID()) ? "You Won!" : "Opponent Won!";
+        }
+        else
+        {
+            currentTurnDisplay = "It's a draw!";
+        }
         turnController.SetState(new TurnState(){
-            CurrentTurn = (match.currentTurnId == LoggedInUser.Instance.GetUserUID()) ? "Your Turn" : "Opponent Turn",
-            CurrentTurnPiece = (match.currentTurnId == match.xOwner) ? "X" : "O"
+            CurrentTurn = currentTurnDisplay,
+            CurrentTurnPiece = currentTurnPieceDisplay
         });
 
         gridController.SetState(new GridState(){
@@ -59,7 +74,19 @@ public class MatchController : MonoBehaviour
             currentTurnPiece = GetCurrentTurnPiece(match)
         });
 
-        if (isYourTurn(match))
+        /* if (isYourTurn(match))
+        {
+            gridController.EnablePlacingPiece();
+        }
+        else
+        {
+            gridController.DisablePlacingPiece();
+        } */
+        if (!string.IsNullOrEmpty(match.winner) || match.draw == true)
+        {
+            gridController.DisablePlacingPiece();
+        }
+        else if (isYourTurn(match))
         {
             gridController.EnablePlacingPiece();
         }
@@ -189,6 +216,8 @@ public class MatchPayload
     public string currentTurnId;
     public string xOwner;
     public string oOwner;
+    public string winner;
+    public bool draw;
     public GameStatePayload gameState; 
 }
 
