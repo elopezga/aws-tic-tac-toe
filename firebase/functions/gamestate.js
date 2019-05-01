@@ -40,7 +40,12 @@ exports.setgamestate = () => functions.https.onRequest((request, response) => {
             }, {merge: true});
     })
     .then(snapshot => {
-        return response.send("yo");
+        return db.collection('games')
+            .doc(gameid)
+            .get();
+    })
+    .then(doc => {
+        return response.send(doc.data());
     })
     .catch(error => {
         return response.send(error);

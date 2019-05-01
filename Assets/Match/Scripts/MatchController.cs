@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class MatchController : MonoBehaviour
 {
@@ -40,6 +41,11 @@ public class MatchController : MonoBehaviour
         gridController.OnStateUpdate -= HandlePiecePlaced;
     }
 
+    public void GoBack()
+    {
+        SceneManager.LoadScene("MainMenu/MainMenu");
+    }
+
     private void HandleStartGame(string payload)
     {
         MatchPayload match = JsonUtility.FromJson<MatchPayload>(payload);
@@ -74,14 +80,6 @@ public class MatchController : MonoBehaviour
             currentTurnPiece = GetCurrentTurnPiece(match)
         });
 
-        /* if (isYourTurn(match))
-        {
-            gridController.EnablePlacingPiece();
-        }
-        else
-        {
-            gridController.DisablePlacingPiece();
-        } */
         if (!string.IsNullOrEmpty(match.winner) || match.draw == true)
         {
             gridController.DisablePlacingPiece();
@@ -103,6 +101,7 @@ public class MatchController : MonoBehaviour
 
     private void HandlePiecePlaced()
     {
+        loadingController.Show();
         // State change happens when piece is placed;
         gridController.DisablePlacingPiece();
         turnController.SetOpponentTurn();
@@ -115,9 +114,10 @@ public class MatchController : MonoBehaviour
         StartCoroutine(MakeApiPostCall(apiCall, payload, SendGameStateSuccess, SendGameStateFail));
     }
 
-    private void SendGameStateSuccess(string message)
+    private void SendGameStateSuccess(string payload)
     {
-        Debug.Log("Success: " + message);
+        HandleStartGame(payload);
+        //Debug.Log("Success: " + message);
     }
 
     private void SendGameStateFail(string message)
