@@ -296,14 +296,16 @@ public class MainMenuController : MonoBehaviour
                 controller.GameId = game.gameid;
                 Vector3 localScale = gameButton.transform.localScale;
 
-                if (game.turn == LoggedInUser.Instance.GetUserUID())
+                gameButton.transform.SetParent(YourTurnSection.transform);
+
+                /* if (game.turn == LoggedInUser.Instance.GetUserUID())
                 {
                     gameButton.transform.SetParent(YourTurnSection.transform);
                 }
                 else
                 {
                     gameButton.transform.SetParent(TheirTurnSection.transform);
-                }
+                } */
 
                 gameButton.transform.localScale = localScale;
 
