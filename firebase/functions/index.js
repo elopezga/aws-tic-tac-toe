@@ -10,6 +10,7 @@ const startgame = require('./startgame');
 const getPlayerInfo = require('./getPlayerInfo');
 const getgameinfo = require('./getgameinfo');
 const createuser = require('./createuser');
+const gamestate = require('./gamestate');
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -28,3 +29,4 @@ exports.getPlayerMenuInfo = getPlayerInfo.getPlayerMenuInfo();
 exports.getgameinfo = getgameinfo.getgameinfo();
 exports.createuser = createuser.createuser();
 exports.createGoogleUser = createuser.createGoogleUser();
+exports.setgamestate = gamestate.setgamestate();

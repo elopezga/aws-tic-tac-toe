@@ -7,6 +7,7 @@ public class LoggedInUser : MonoBehaviour
 
     private Firebase.Auth.FirebaseUser loggedInUser = null;
     private Firebase.Auth.FirebaseAuth auth = null;
+    public string currentGameId = "";
 
     void Awake()
     {
