@@ -10,7 +10,7 @@ public class LoginWithEmailFormController : MonoBehaviour
     private Text email;
 
     [SerializeField]
-    private Text password;
+    private InputField password;
 
     private Firebase.Auth.FirebaseAuth auth;
 
@@ -34,7 +34,8 @@ public class LoginWithEmailFormController : MonoBehaviour
         Debug.Log(email.text);
         Debug.Log(password.text);
         auth.SignInWithEmailAndPasswordAsync(email.text, password.text)
-            .ContinueWith(task => {
+            .ContinueWith(task =>
+            {
                 if (task.IsCanceled)
                 {
                     Debug.LogError("SignInWithEmailAndPasswordAsync was canceled");
@@ -52,6 +53,7 @@ public class LoginWithEmailFormController : MonoBehaviour
                 LoggedInUser.Instance.SetLoggedInUser(newUser);
                 logInSuccessful = true;
             });
+        LoggedInUser.Instance.SetAuth(auth); // Added
     }
 
     public void GoToMainMenu()

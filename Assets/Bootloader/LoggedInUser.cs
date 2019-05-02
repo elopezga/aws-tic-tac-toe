@@ -37,7 +37,12 @@ public class LoggedInUser : MonoBehaviour
         {
             auth.SignOut();
         }
-        Google.GoogleSignIn.DefaultInstance.SignOut();
+        try
+        {
+            Google.GoogleSignIn.DefaultInstance.SignOut();
+        }
+        catch { }
+
         loggedInUser = null;
     }
 }

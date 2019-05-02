@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/MainMenu/MainMenu.unity
     guid: 357350a9e174fed488d92977d8de4f86
+  - enabled: 1
+    path: Assets/Match/Match.unity
+    guid: c9c1c2472ff395c4a9e6eb9dafd342e2
   m_configObjects: {}

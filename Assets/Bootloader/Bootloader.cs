@@ -7,7 +7,7 @@ public class Bootloader : MonoBehaviour
 {
     void OnGUI()
     {
-        if (GUI.Button(new Rect(0f, 0f, 100f, 100f), "Load"))
+        if (GUI.Button(new Rect(50f, 50f, 400f, 400f), "Play!"))
         {
             SceneManager.LoadScene("Login/Login");
         }
