@@ -284,6 +284,7 @@ public class MainMenuController : MonoBehaviour
         if (currentPlayerMenuData != null)
         {
             GameObject gameButtonPrefab = Resources.Load("GameButton") as GameObject;
+            RemoveAllFindingPlayers();
             RemoveAllGames();
             foreach (PlayerMenuGamesDataContainer game in currentPlayerMenuData.games)
             {
