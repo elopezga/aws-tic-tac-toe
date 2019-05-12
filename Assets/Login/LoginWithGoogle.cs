@@ -19,6 +19,8 @@ public class LoginWithGoogle : MonoBehaviour
     private string createGoogleUserEndpoint = "https://us-central1-aws-tic-tac-toe.cloudfunctions.net/createGoogleUser?uuid={0}";
 
     private bool logInSuccessful = false;
+    private bool doLoginApiCall = false;
+    Firebase.Auth.FirebaseUser firebaseUser = null;
 
     void Awake()
     {
@@ -33,6 +35,23 @@ public class LoginWithGoogle : MonoBehaviour
 
     void Update()
     {
+        if (doLoginApiCall)
+        {
+            // Only do call once
+            // StartCoroutine does not work inside Task callback
+            doLoginApiCall = false;
+            string apiCall = string.Format(createGoogleUserEndpoint, firebaseUser.UserId);
+            StartCoroutine(MakeAPICall(apiCall,
+            status => {
+                LoggedInUser.Instance.SetLoggedInUser(firebaseUser);
+                LoggedInUser.Instance.SetAuth(authentication);
+                logInSuccessful = true;
+            },
+            status => {
+                Debug.LogError("Something went wrong :(");
+            }));
+        }
+
         if (logInSuccessful)
         {
             SceneManager.LoadScene("MainMenu/MainMenu");
@@ -51,40 +70,33 @@ public class LoginWithGoogle : MonoBehaviour
             .ContinueWith(GetGoogleSignInIdToken)
             .ContinueWith(GetFirebaseCredential)
             .ContinueWith(FirebaseSignIn)
-            .ContinueWith( firebaseUserTask => {
-                if (firebaseUserTask.IsCanceled)
-                {
-                    throw new System.Exception("Firebase user task was unexpectedly cancelled.");
-                }
-                else if (firebaseUserTask.IsFaulted)
-                {
-                    throw new System.Exception("Firebase user task is faulted.");
-                }
-                else
-                {
-                    Firebase.Auth.FirebaseUser newUser = firebaseUserTask.Result.Result;
-                    
-                    string apiCall = string.Format(createGoogleUserEndpoint, newUser.UserId);
-                    StartCoroutine(MakeAPICall(apiCall,
-                    status => {
-                        if (status == "true")
-                        {
-                            LoggedInUser.Instance.SetLoggedInUser(newUser);
-                            LoggedInUser.Instance.SetAuth(authentication);
-                            logInSuccessful = true;
-                        }
-                    },
-                    status => {
-                        Debug.LogError("Something went wrong :(");
-                    }));
-                }
-            });
+            .ContinueWith(GameSignIn);
         }
         catch (System.Exception e)
         {
+            Debug.LogError("Something went wrong with sign in");
             Debug.LogError(e);
         }
         
+    }
+
+    private void GameSignIn(Task<Task<Firebase.Auth.FirebaseUser>> userTask)
+    {
+        Debug.Log("Do game sign in");
+        if (userTask.IsCanceled)
+        {
+            throw new System.Exception("Firebase user task was unexpectedly cancelled.");
+        }
+        else if (userTask.IsFaulted)
+        {
+            throw new System.Exception("Firebase user taks is faulted.");
+        }
+        else
+        {
+            firebaseUser = userTask.Result.Result;
+            Debug.Log("Hello " + firebaseUser.DisplayName);
+            doLoginApiCall = true;
+        }
     }
 
     private IEnumerator MakeAPICall(string apiCall, Action<string> onSuccess, Action<string> onFail)
@@ -105,6 +117,7 @@ public class LoginWithGoogle : MonoBehaviour
 
     private Firebase.Auth.Credential GetFirebaseCredential(Task<string> googleIdTokenTask)
     {
+        Debug.Log("Get firebase credential");
         Firebase.Auth.Credential credential = Firebase.Auth.GoogleAuthProvider.GetCredential(googleIdTokenTask.Result, null);
 
         if (credential == null)
@@ -113,24 +126,28 @@ public class LoginWithGoogle : MonoBehaviour
         }
         else
         {
+            Debug.Log(credential.ToString());
             return credential;
         }
     }
 
     private Task<Firebase.Auth.FirebaseUser> FirebaseSignIn(Task<Firebase.Auth.Credential> firebaseCredentialTask)
     {
+        Debug.Log("Do firebase sign in");
         if (authentication == null)
         {
             throw new System.Exception("Firebase authenticator is null!");
         }
         else
         {
+            Debug.Log("Success");
             return authentication.SignInWithCredentialAsync(firebaseCredentialTask.Result);
         }
     }
 
     private string GetGoogleSignInIdToken(Task<GoogleSignInUser> googleSignInTask)
     {
+        Debug.Log("Get Google Sign In ID Token");
         if (googleSignInTask.IsFaulted)
         {
             using (IEnumerator<System.Exception> exceptionEnumerator = googleSignInTask.Exception.InnerExceptions.GetEnumerator())
@@ -151,6 +168,7 @@ public class LoginWithGoogle : MonoBehaviour
         }
         else
         {
+            Debug.Log(googleSignInTask.Result.IdToken);
             return googleSignInTask.Result.IdToken;
         }
     }
